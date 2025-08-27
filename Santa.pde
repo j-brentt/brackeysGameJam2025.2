@@ -54,4 +54,5 @@ class Santa {
   void yMovement(int sign) {
     velocity.y = maxVelocity * sign;
   }
+
 }

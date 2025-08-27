@@ -1,9 +1,12 @@
 //I'm thinking we add walls to the Walls arraylist and then display them in draw()
 ArrayList<Wall> Walls = new ArrayList<Wall>();
+
 boolean keyUpPressed, keyDownPressed, keyLeftPressed, keyRightPressed;
 Santa santa;
 
-void setup(){
+
+
+void setup() {
   size(1280, 720);
   background(255);
   santa = new Santa(50, 50);
@@ -89,3 +92,4 @@ void keyReleased() {
     keyRightPressed = false;
   }
 }
+

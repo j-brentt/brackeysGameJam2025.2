@@ -18,4 +18,7 @@ class Wall{
     rect(x,y,xlength,ylength); //replace with code for image
   }
   
+  void nothing() {
+  }
+  
 }

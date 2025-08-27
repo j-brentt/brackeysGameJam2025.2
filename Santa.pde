@@ -32,5 +32,4 @@ class Santa{
       xvelocity = xvelocitycap;
     }
   } //repeat the accel function for the other 3 directions.
-  
 }

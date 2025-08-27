@@ -11,7 +11,7 @@ class Child{
   
   
   
-  void display(int sprite_type){
+  void display(int sprite_type) {
     //draw child of correct sprite type (if we want children from different countries to look different, idk if we r gonna have moving/running animation. If we do, then add another int to the arguments and increment every number of frames)
     //then check frame number modulo no. of animation frames then display accordingly. I guess the same goes for santa.
   }

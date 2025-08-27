@@ -17,7 +17,9 @@ class Wall{
     fill(100,100,100);
     rect(x,y,xlength,ylength); //replace with code for image
   }
+
   boolean detect(){
     return true;
   }
+
 }

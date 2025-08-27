@@ -17,7 +17,12 @@ class Wall{
     fill(100,100,100);
     rect(x,y,xlength,ylength); //replace with code for image
   }
-  boolean detect(){
-    return true;
+  boolean detect(float xpos, float ypos){
+    if (x>xpos && x<xpos+xlength && y>ypos && y<ypos+ylength){
+      return true;
+    }
+    else{
+    return false;
+    }
   }
 }

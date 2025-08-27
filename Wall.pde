@@ -25,4 +25,5 @@ class Wall{
     return false;
     }
   }
+
 }

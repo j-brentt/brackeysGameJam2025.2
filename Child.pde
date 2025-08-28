@@ -8,6 +8,7 @@ class Child{
   int sprite_type;
   float vision_angle; 
   float vision_radius;
+  int facing_direction; //0 for up, 1 for right, 2 for down, 3 for left
   
   
   
@@ -19,9 +20,17 @@ class Child{
     //yeah... i have no clue how we're gonna pathfind these kids towards santa in a maze. Is it okay if they're semi-random? It doesn't seem hard to stop them from running into walls at least, since u can just do a check by looping through the walls.
     //but actual pathfinding seems hard... Ofc if they can see santa they should beeline to him, maybe thats more realistic anyways?
     
-    //hard code in the pathfinding by letting the children go in loops (maybe more than 1 loop for randomness)
+    //hard code in the pathfinding by letting the children go in loops (maybe more than 1 loop for randomness). Or make grid manually for each stage and use A* algorithm
   }
   
+  void sightcone(){
+    float angle;
+    angle = facing_direction*90 - vision_angle/2;
+    while (angle < facing_direction*90 + vision_angle/2){
+      angle+= 2;
+      
+    }
+  }
   
   
 }

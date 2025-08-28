@@ -1,6 +1,6 @@
-class Santa {
+class Santa { //<>// //<>//
   PVector position;
-  float size = 50;
+  PVector size = new PVector(50, 50);
   float weight;
   float friction = 0.95;
 
@@ -20,17 +20,18 @@ class Santa {
   }
 
   void update() {
-    
+
     movement();
   }
 
   void display() {
     // draw santa centered at x,y with size size
-    rect(position.x, position.y, size, size);
+    rect(position.x, position.y, size.x, size.y);
   }
-  
+
   void movement() {
-    acceleration.set(0,0); //<>//
+
+    acceleration.set(0,0);
     if (keyUpPressed) acceleration.y = -0.2;
     if (keyDownPressed) acceleration.y = 0.2;
     if (keyLeftPressed) acceleration.x = -0.2;
@@ -38,15 +39,30 @@ class Santa {
     
     if (!keyUpPressed && !keyDownPressed) velocity.y *= friction;
     if (abs(velocity.y) < 0.01) velocity.y = 0;
-    
+
     if (!keyLeftPressed && !keyRightPressed) velocity.x *= friction;
     if (abs(velocity.x) < 0.01) velocity.x = 0;
 
-    velocity.add(acceleration); //<>//
+
+    velocity.add(acceleration);
     velocity.limit(maxVelocity);
-    position.add(velocity);
+    for (Wall w : Walls) {
+      PVector velocityX = new PVector(velocity.x, 0);
+      PVector velocityY = new PVector(0, velocity.y);
+      if (detectNoCollision(position.copy().add(velocityX), w.position, size, w.size) == 1) {
+        position.add(velocityX);
+      }
+      if (detectNoCollision(position.copy().add(velocityX), w.position, size, w.size) == 2) {
+        velocity.x = 0;
+      }
+      if (detectNoCollision(position.copy().add(velocityY), w.position, size, w.size) == 1) {
+        position.add(velocityY);
+      }
+      if (detectNoCollision(position.copy().add(velocityY), w.position, size, w.size) == 2) {
+        velocity.y = 0;
+      } 
+    }
   }
-  
   void xMovement(int sign) {
     velocity.x = maxVelocity * sign;
   }
@@ -54,5 +70,4 @@ class Santa {
   void yMovement(int sign) {
     velocity.y = maxVelocity * sign;
   }
-
 }

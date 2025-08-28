@@ -2,16 +2,15 @@ class Items {
   PVector position;
   PVector size;
   boolean collected = false;
+  
+  int holdRequiredMillis = 3000;
 
   Items(float x, float y, float w, float h) {
     position = new PVector(x, y);
     size = new PVector(w, h);
   }
 
-  // Axis-aligned bounding-box overlap test
   boolean overlapsWithSanta(Santa s) {
-    // Santa's rect: s.position.x .. s.position.x + s.size.x
-    // Item's rect: position.x .. position.x + size.x
     if (s.position.x + s.size.x < position.x) return false;
     if (s.position.x > position.x + size.x) return false;
     if (s.position.y + s.size.y < position.y) return false;
@@ -30,12 +29,12 @@ class Items {
 class Cookie extends Items {
   Cookie(float x, float y) {
     super(x, y, 15, 15);
+    holdRequiredMillis = 1500; // 1.5 seconds
   }
 
   void display() {
     if (!collected) {
       pushMatrix();
-      // draw cookie centered in its box
       ellipseMode(CORNER);
       ellipse(position.x, position.y, size.x, size.y);
       popMatrix();
@@ -47,7 +46,7 @@ class Cookie extends Items {
       collected = true;
       s.cookieCount++;            
       // s.weight += 0.5;           // eating increases weight
-      // sounds and/or animations can be added here
+      // sounds and/or animations can be added here after
     }
   }
 }
@@ -55,19 +54,49 @@ class Cookie extends Items {
 class Stocking extends Items {
   Stocking(float x, float y) {
     super(x, y, 15, 20);
+    holdRequiredMillis = 2000; // 2 seconds
   }
 
   void display() {
     if (!collected) {
-      rect(position.x, position.y, size.x, size.y);s
+      rect(position.x, position.y, size.x, size.y);
+    }
+  }
+  
+  // Added onInteract for Stocking
+  void onInteract(Santa s) {
+    if (!collected && overlapsWithSanta(s)) {
+      collected = true;
+      s.stockingsFilled++;
+      // optionally add reward/effect
+    }
+  }
+}
+  
+class Chimney extends Items {
+  int stockingsRequired; // how many stockings must be filled to allow level completion
+
+  Chimney(float x, float y, int stockingsRequired) {
+    super(x, y, 40, 60);
+    this.stockingsRequired = stockingsRequired;
+    holdRequiredMillis = 5000; // 5 seconds
+  }
+
+  void display() {
+    if (!collected) {
+      pushMatrix();
+      rectMode(CORNER);
+      rect(position.x, position.y, size.x, size.y);
+      popMatrix();
     }
   }
 
   void onInteract(Santa s) {
-    if (!collected && overlapsWithSanta(s)) {
+    // Only call this if stockings requirement has been checked before starting the hold.
+    // But for safety, check again here:
+    if (!collected && s.stockingsFilled >= stockingsRequired) {
       collected = true;
-      s.stockingsFilled++;       // increment Santa's stocking stat
-      // optionally change velocity limits or other effects
+      // Indicate level complete — handled in main by levelComplete()
     }
   }
 }

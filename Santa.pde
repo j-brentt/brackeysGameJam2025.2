@@ -26,10 +26,11 @@ class Santa { //<>// //<>//
 
   void display() {
     // draw santa centered at x,y with size size
+    fill(255, 0, 0);
     rect(position.x, position.y, size.x, size.y);
   }
 
-  void movement() {
+  void movement() { //<>//
 
     acceleration.set(0,0);
     if (keyUpPressed) acceleration.y = -0.2;
@@ -41,7 +42,7 @@ class Santa { //<>// //<>//
     if (abs(velocity.y) < 0.01) velocity.y = 0;
 
     if (!keyLeftPressed && !keyRightPressed) velocity.x *= friction;
-    if (abs(velocity.x) < 0.01) velocity.x = 0;
+    if (abs(velocity.x) < 0.01) velocity.x = 0; //<>//
 
 
     velocity.add(acceleration);

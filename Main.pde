@@ -3,14 +3,23 @@ ArrayList<Wall> Walls = new ArrayList<Wall>();
 
 boolean keyUpPressed, keyDownPressed, keyLeftPressed, keyRightPressed;
 Santa santa;
+Wall wall;
 
+int detectNoCollision(PVector obj1, PVector obj2, PVector size1, PVector size2){
+  if (obj1.x+size1.x < obj2.x || obj1.x > obj2.x+size2.x || obj1.y+size1.y < obj2.y || obj1.y > obj2.y+size2.y){
+    return 1;
+  }
+  else{
+    return 2;}
 
+}
 
 void setup() {
   size(1280, 720);
   background(255);
   santa = new Santa(50, 50);
-  
+  wall = new Wall(200,200,10,100, 1);
+  Walls.add(wall);
   textSize(48);
   
 }
@@ -92,4 +101,3 @@ void keyReleased() {
     keyRightPressed = false;
   }
 }
-

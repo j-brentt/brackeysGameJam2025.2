@@ -1,8 +1,9 @@
-class Santa { //<>// //<>//
+class Santa { //<>// //<>// //<>// //<>//
   PVector position;
   PVector size = new PVector(50, 50);
   float weight;
   float friction = 0.95;
+  boolean alive = true;
 
   PVector velocity = new PVector(0, 0);
   float maxVelocity = 5;

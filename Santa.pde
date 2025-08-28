@@ -30,17 +30,19 @@ class Santa { //<>// //<>//
   }
 
   void movement() {
-    acceleration.set(0, 0);
-    if (keyUpPressed) acceleration.y = -0.05;
-    if (keyDownPressed) acceleration.y = 0.05;
-    if (keyLeftPressed) acceleration.x = -0.05;
-    if (keyRightPressed) acceleration.x = 0.05;
 
+    acceleration.set(0,0);
+    if (keyUpPressed) acceleration.y = -0.2;
+    if (keyDownPressed) acceleration.y = 0.2;
+    if (keyLeftPressed) acceleration.x = -0.2;
+    if (keyRightPressed) acceleration.x = 0.2;
+    
     if (!keyUpPressed && !keyDownPressed) velocity.y *= friction;
     if (abs(velocity.y) < 0.01) velocity.y = 0;
 
     if (!keyLeftPressed && !keyRightPressed) velocity.x *= friction;
     if (abs(velocity.x) < 0.01) velocity.x = 0;
+
 
     velocity.add(acceleration);
     velocity.limit(maxVelocity);

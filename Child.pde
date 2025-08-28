@@ -1,17 +1,18 @@
 class Child{
-  float x;
-  float y;
-  float alertness; //(maybe this should be an int)
+  int alertness = 0; //(maybe this should be an int)
   boolean enraged; //not sure if we're doing both systems or just 1
-  float xvelocity;
-  float yvelocity;
+  
+  PVector position;
+  PVector velocity = new PVector(0,0);
   int sprite_type;
   float vision_angle; 
   float vision_radius;
   int facing_direction; //0 for up, 1 for right, 2 for down, 3 for left
   
   
-  
+  Child(float x, float y) {
+    this.position = new PVector(x, y);
+  }
   void display(int sprite_type) {
     //draw child of correct sprite type (if we want children from different countries to look different, idk if we r gonna have moving/running animation. If we do, then add another int to the arguments and increment every number of frames)
     //then check frame number modulo no. of animation frames then display accordingly. I guess the same goes for santa.

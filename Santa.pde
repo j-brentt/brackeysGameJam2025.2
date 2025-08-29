@@ -1,11 +1,4 @@
- //<>//
-
-
-
-
-
-
-class Santa { //<>// //<>// //<>//
+class Santa {
   PVector position;
   PVector size = new PVector(50, 50);
   float weight;

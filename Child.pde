@@ -2,13 +2,14 @@ class Child{
   int alertness = 0; //(maybe this should be an int)
   boolean enraged; //not sure if we're doing both systems or just 1
   PVector size;
-  
+  boolean blind;
   PVector position; // this is center of child
   PVector velocity = new PVector(0,0);
   int sprite_type;
   float vision_angle; 
   float vision_radius;
   int facing_direction; //0 for right, 1 for down, 2 for left, 3 for up
+  int blindTime;
   
   
   Child(float x, float y, float sizeX, float sizeY, float vision_angle, float vision_radius) {
@@ -17,6 +18,8 @@ class Child{
     this.facing_direction = 2;
     this.vision_angle = vision_angle;
     this.vision_radius = vision_radius;
+    this.blind = false;
+    this.blindTime = 0;
   }
   void display() {
     PVector corner_position = new PVector(position.x-size.x/2, position.y-size.y/2);

@@ -3,7 +3,7 @@ ArrayList<Wall> Walls = new ArrayList<Wall>();
 ArrayList<Child> Childs = new ArrayList<Child>();
 ArrayList<SightBullet> SightBullets = new ArrayList<SightBullet>();
 PVector pointsize = new PVector(0,0);
-boolean keyUpPressed, keyDownPressed, keyLeftPressed, keyRightPressed, keyDashPressed;
+boolean keyUpPressed, keyDownPressed, keyLeftPressed, keyRightPressed, keyDashPressed, keyEPressed;
 int dashedFrames = 0, dashInactive = 0;
 Santa santa;
 Wall wall;
@@ -17,6 +17,11 @@ int detectNoCollision(PVector obj1, PVector obj2, PVector size1, PVector size2){
 }
 
 void setup() {
+//  PImage[] SantaWalkFront = new PImage[10];
+//  for (int i = 1; i < 11; i++) {
+//String imageName = "Frame" + nf(i, 5) + ".png";
+//SantaWalkFront[i] = loadImage(imageName);
+//}
   size(1280, 720);
   background(255);
   santa = new Santa(50, 50);
@@ -35,7 +40,16 @@ void draw(){
     w.display();
   }
   for (Child c : Childs){
+    if (c.blind == false){
     c.createSightBullets();
+    }
+    if (c.blind == true){
+      c.blindTime += 1;
+      if (c.blindTime > 150){
+        c.blind = false;
+        c.blindTime = 0;
+      }
+    }
     c.display();
   }
   for (SightBullet sb : SightBullets){
@@ -142,6 +156,13 @@ void keyPressed() {
   }
   if (key == ' ' && santa.cooldown1 < 1) {
     keyDashPressed = true;
+  }
+  if (key == 'e' && santa.cooldown2 < 1){
+    for (Child c : Childs){
+      if (((c.position.copy()).sub(santa.position.copy())).mag() < santa.EMP_radius){
+        c.blind = true;
+      }
+    }
   }
 }
 

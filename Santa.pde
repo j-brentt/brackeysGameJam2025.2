@@ -1,10 +1,17 @@
-class Santa { //<>// //<>// //<>// //<>//
+ //<>//
+
+
+
+
+
+
+class Santa { //<>// //<>// //<>//
   PVector position;
   PVector size = new PVector(50, 50);
   float weight;
   float friction = 0.95;
   boolean alive = true;
-
+  float EMP_radius;
   PVector velocity = new PVector(0, 0);
   float maxVelocity = 5;
   PVector acceleration = new PVector(0, 0);
@@ -19,6 +26,7 @@ class Santa { //<>// //<>// //<>// //<>//
   Santa(float x, float y) {
     this.position = new PVector(x, y);
     this.cooldown1 = 0;
+    this.EMP_radius = 200;
   }
 
   void update() {

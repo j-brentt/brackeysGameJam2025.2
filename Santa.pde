@@ -3,7 +3,7 @@ class Santa {
   PVector size = new PVector(50, 50);
   float weight;
   float friction = 0.95;
-  boolean alive = true;
+  boolean notObserved = true;
   float EMP_radius;
   PVector velocity = new PVector(0, 0);
   float maxVelocity = 5;
@@ -17,6 +17,7 @@ class Santa {
   boolean invisible;
   int invisibleTime;
   int invisibleTimeMax;
+  int timeObserved;
   float ability1Cooldown; //cooldown for dash
   float ability2Cooldown; //cooldown for EMP
   float ability3Cooldown; //cooldown for invisibility
@@ -35,6 +36,7 @@ class Santa {
     this.invisible = false;
     this.invisibleTime = 0;
     this.invisibleTimeMax = 60;
+    this.timeObserved = 0;
   }
 
   void update() {

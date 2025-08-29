@@ -56,15 +56,15 @@ void draw() {
     sb.display();
   }
   SightBullets.clear();
-  if (santa.alive == false) {
+  if (santa.notObserved == false) {
     fill(255, 0, 0);
     rect(width-100, 0, 100, 100); //for testing
   }
-  if (santa.alive == true) {
+  if (santa.notObserved == true) {
     fill(0, 255, 0);
     rect(width-100, 0, 100, 100); //for testing
   }
-  santa.alive = true; // this is for testing
+  santa.notObserved = true; // this is for testing
   santa.update();
   santa.display();
   if (keyDashPressed == true) {

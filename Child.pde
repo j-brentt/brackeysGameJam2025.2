@@ -41,7 +41,6 @@ class Child{
       angle+= 2*PI/180;
       SightBullet sb = new SightBullet(position.x, position.y, angle, vision_radius, this);
       SightBullets.add(sb);
-      print("created sb");
     }
   }
   
@@ -84,13 +83,16 @@ class SightBullet{
      position.add(step);
      if (detectNoCollision(position, santa.position, pointsize, santa.size) == 2 && santa.invisible == false){
        deleted = true;
-       santa.alive = false;
-       print("SANTA IS DEAD!!");
+       santa.notObserved = false;
+       santa.timeObserved += 1;
+       if (santa.timeObserved > 180){
+       print("SANTA IS CAUGHT!!");
+       santa.timeObserved = 0;
+       }
      }
      for (Wall w : Walls){
      if (detectNoCollision(position, w.position, pointsize, w.size) == 2){
        deleted = true;
-       print("DELETED");
      }
      }
    }

@@ -22,6 +22,7 @@ int detectNoCollision(PVector obj1, PVector obj2, PVector size1, PVector size2) 
 }
 
 void setup() {
+  frameRate(60);
   PImage[] SantaWalkFront = new PImage[9];
    for (int i = 1; i < 10; i++) {
   String imageName = "Santa_Walking_Front\\frame_" + nf(i, 5) + ".png";

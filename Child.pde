@@ -83,7 +83,7 @@ class Child{
     float angle;
     angle = facing_direction*90*PI/180 - (vision_angle/2)*PI/180;
     while (angle < facing_direction*90*PI/180 + (vision_angle/2) * PI/180){
-      angle+= 0.5*PI/180;
+      angle+= 2*PI/180;
       SightBullet sb = new SightBullet(position.x, position.y, angle, vision_radius, this);
       SightBullets.add(sb);
       //print("created sb");
@@ -118,8 +118,8 @@ class SightBullet{
     this.c = c;
   }
   void display(){
-    fill(0,0,255);
-    line(xInit, yInit, x, y);
+    //fill(0,0,255);
+    //line(xInit, yInit, x, y);
   }
   void hitscan(){
    while(position.copy().sub(positionInit.copy()).mag() < radius && deleted == false){

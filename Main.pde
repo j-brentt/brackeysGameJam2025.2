@@ -7,7 +7,8 @@ ArrayList<Wall> Walls = new ArrayList<Wall>();
 ArrayList<Child> Childs = new ArrayList<Child>();
 ArrayList<SightBullet> SightBullets = new ArrayList<SightBullet>(); //<>//
 PVector pointsize = new PVector(0,0);
-boolean keyUpPressed, keyDownPressed, keyLeftPressed, keyRightPressed;
+boolean keyUpPressed, keyDownPressed, keyLeftPressed, keyRightPressed, keyDashPressed;
+int dashedFrames = 0, dashInactive = 0;
 Santa santa;
 Wall wall;
 NodeGraph nodeGraph;
@@ -16,10 +17,10 @@ Child child;
 int detectNoCollision(PVector obj1, PVector obj2, PVector size1, PVector size2){ //<>//
   if (obj1.x+size1.x < obj2.x || obj1.x > obj2.x+size2.x || obj1.y+size1.y < obj2.y || obj1.y > obj2.y+size2.y){
     return 1;
+
   } else {
     return 2;
-  } //<>//
-}
+  } 
 
 void setup() {
   size(1280, 720);
@@ -34,6 +35,7 @@ void setup() {
 }
 
 void draw() {
+
   background(255);
   for (Wall w : Walls) {
     w.display();
@@ -67,7 +69,41 @@ void draw() {
   santa.alive = true; // this is for testing
   santa.update();
   santa.display();
+
   nodeGraph.display();
+  if (keyDashPressed == true){
+  dashedFrames+= 1;
+    if (dashedFrames == 15){
+      santa.cooldown1 = 60;
+      keyDashPressed = false;
+      dashedFrames = 0;
+    }
+  }
+  
+  santa.cooldown1 -= 1;
+  if (santa.cooldown1 < 1){
+    fill(0,255,0);
+    text("Dash:", 700, 700);
+    fill(255);
+    rect(825,672, 200, 30);
+    fill(0,255,0);
+    rect(825,672, (15-dashedFrames)*200/15, 30);
+    if (dashedFrames != 0){
+    dashInactive += 1;
+    }
+  }
+  if (dashInactive > 60){
+    dashInactive = 0;
+    dashedFrames = 0;
+  }
+  if (santa.cooldown1 >= 1){
+    fill(255,0,0);
+    text("Dash:", 700, 700);
+    fill(255);
+    rect(825,672, 200, 30);
+    fill(255,0,0);
+    rect(825,672, (15-dashedFrames)*200/15, 30);
+  }
 
   fill(0);
   if (keyUpPressed) {
@@ -98,6 +134,10 @@ void draw() {
   fill(255);
 }
 
+void mouseClicked(){
+  Childs.add(new Child(mouseX, mouseY, 25, 25, 100, 300));
+}
+
 void keyPressed() {
   if (key == 'w' || keyCode == UP) {
     keyUpPressed = true;
@@ -117,10 +157,15 @@ void keyPressed() {
     keyRightPressed = true;
     keyLeftPressed = false;
   }
+
   
   //Adding Edges testing
   if (keyCode >= 48 && keyCode < 57) {
     nodeGraph.newEdge(nodeGraph.nodes.get(nodeGraph.nodes.size()-1), nodeGraph.nodes.get(keyCode - 48));
+
+  if (key == ' ' && santa.cooldown1 < 1) {
+    keyDashPressed = true;
+
   }
 }
 
@@ -139,13 +184,6 @@ void keyReleased() {
   if (key == 'd' || keyCode == RIGHT) {
     keyRightPressed = false;
   }
-  
-  if (key == 'b') {
-    println("currentNode: " + child.currentNode.position);
-    println("goalNode: " + child.goalNode.position);
-    println("santaNode: " + nodeGraph.santaNode.position);
-
-  }
 }
 
 
@@ -154,5 +192,9 @@ void mousePressed() {
   if (nodeGraph.nodes.size() == 1) {
     child = new Child(mouseX, mouseY, 25, 25, 100, 300, nodeGraph.nodes.get(0));
     Childs.add(child);
+
+  if (key == ' ') {
+    keyDashPressed = false;
+
   }
 }

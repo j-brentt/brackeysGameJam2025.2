@@ -14,7 +14,6 @@ int detectNoCollision(PVector obj1, PVector obj2, PVector size1, PVector size2){
   }
   else{
     return 2;}
-
 }
 
 void setup() {
@@ -30,6 +29,7 @@ void setup() {
 }
 
 void draw(){
+  
   background(255);
   for (Wall w : Walls){
     w.display();
@@ -117,6 +117,10 @@ void draw(){
   fill(255);
 }
 
+void mouseClicked(){
+  Childs.add(new Child(mouseX, mouseY, 25, 25, 100, 300));
+}
+
 void keyPressed() {
   if (key == 'w' || keyCode == UP) {
     keyUpPressed = true;
@@ -139,7 +143,6 @@ void keyPressed() {
   if (key == ' ' && santa.cooldown1 < 1) {
     keyDashPressed = true;
   }
-
 }
 
 void keyReleased() {

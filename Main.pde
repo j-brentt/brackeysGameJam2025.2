@@ -17,11 +17,21 @@ int detectNoCollision(PVector obj1, PVector obj2, PVector size1, PVector size2) 
 }
 
 void setup() {
-  //  PImage[] SantaWalkFront = new PImage[10];
-  //  for (int i = 1; i < 11; i++) {
-  //String imageName = "Frame" + nf(i, 5) + ".png";
-  //SantaWalkFront[i] = loadImage(imageName);
-  //}
+  PImage[] SantaWalkFront = new PImage[9];
+   for (int i = 1; i < 10; i++) {
+  String imageName = "Santa_Walking_Front\\frame_" + nf(i, 5) + ".png";
+  SantaWalkFront[i-1] = loadImage(imageName);
+  }
+  PImage[] SantaWalkSide = new PImage[10];
+   for (int i = 1; i < 11; i++) {
+  String imageName = "Santa_Walking_Side\\frame_" + nf(i, 5) + ".png";
+  SantaWalkSide[i-1] = loadImage(imageName);
+  }
+  PImage[] SantaWalkBackside = new PImage[9];
+   for (int i = 1; i < 10; i++) {
+  String imageName = "Santa_Walking_Backside\\frame_" + nf(i, 5) + ".png";
+  SantaWalkBackside[i-1] = loadImage(imageName);
+  }
   size(1280, 720);
   background(255);
   santa = new Santa(50, 50);
@@ -170,15 +180,15 @@ void keyPressed() {
   if (key == ' ' && santa.cooldown1 < 1) {
     keyDashPressed = true;
   }
-  if (key == '1' && santa.cooldown2 < 1) {
+  if (key == 'k' && santa.cooldown2 < 1) {
     for (Child c : Childs) {
-      if (((c.position.copy()).sub(santa.position.copy())).mag() < santa.EMP_radius) {
+      if (((c.position.copy()).sub(santa.position.copy().add(santa.size.copy().mult(0.5)))).mag() < santa.EMP_radius) {
         c.blind = true;
         santa.cooldown2 = santa.ability2Cooldown;
       }
     }
   }
-  if (key =='2' && santa.cooldown3 < 1){
+  if (key =='o' && santa.cooldown3 < 1){
     santa.invisible = true;
   }
 }

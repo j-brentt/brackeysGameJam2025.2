@@ -1,42 +1,57 @@
 //I'm thinking we add walls to the Walls arraylist and then display them in draw()
+import java.util.PriorityQueue;
+import java.util.HashSet;
+
+
 ArrayList<Wall> Walls = new ArrayList<Wall>();
 ArrayList<Child> Childs = new ArrayList<Child>();
-ArrayList<SightBullet> SightBullets = new ArrayList<SightBullet>();
+ArrayList<SightBullet> SightBullets = new ArrayList<SightBullet>(); //<>//
 PVector pointsize = new PVector(0,0);
 boolean keyUpPressed, keyDownPressed, keyLeftPressed, keyRightPressed, keyDashPressed;
 int dashedFrames = 0, dashInactive = 0;
 Santa santa;
 Wall wall;
+NodeGraph nodeGraph;
 Child child;
-int detectNoCollision(PVector obj1, PVector obj2, PVector size1, PVector size2){
+
+int detectNoCollision(PVector obj1, PVector obj2, PVector size1, PVector size2){ //<>//
   if (obj1.x+size1.x < obj2.x || obj1.x > obj2.x+size2.x || obj1.y+size1.y < obj2.y || obj1.y > obj2.y+size2.y){
     return 1;
-  }
-  else{
-    return 2;}
-}
+
+  } else {
+    return 2;
+  } 
 
 void setup() {
   size(1280, 720);
   background(255);
   santa = new Santa(50, 50);
-  wall = new Wall(200,200,10,100, 1);
-  child = new Child(300, 250, 25, 25, 100, 300);
-  Childs.add(child);
+  nodeGraph = new NodeGraph(-1);
+  wall = new Wall(200, 200, 10, 100, 1);
+  //child = new Child(300, 250, 25, 25, 100, 300);
+  //Childs.add(child);
   Walls.add(wall);
   textSize(48);
-  
 }
 
-void draw(){
-  
+void draw() {
+
   background(255);
-  for (Wall w : Walls){
+  for (Wall w : Walls) {
     w.display();
   }
+  
+  
   for (Child c : Childs){
     c.createSightBullets();
     c.display();
+    
+    if (nodeGraph.santaNode != c.goalNode) {
+      c.pathfinding();
+    }
+    
+    
+    
   }
   for (SightBullet sb : SightBullets){
     sb.hitscan();
@@ -54,6 +69,8 @@ void draw(){
   santa.alive = true; // this is for testing
   santa.update();
   santa.display();
+
+  nodeGraph.display();
   if (keyDashPressed == true){
   dashedFrames+= 1;
     if (dashedFrames == 15){
@@ -87,7 +104,7 @@ void draw(){
     fill(255,0,0);
     rect(825,672, (15-dashedFrames)*200/15, 30);
   }
-  
+
   fill(0);
   if (keyUpPressed) {
     fill(#08FF09);
@@ -95,20 +112,20 @@ void draw(){
     fill(0);
   }
   text("w", 50, 50);
-  
+
   if (keyLeftPressed) {
     fill(#08FF09);
   } else {
     fill(0);
   }
   text("a", 25, 75);
-    if (keyDownPressed) {
+  if (keyDownPressed) {
     fill(#08FF09);
   } else {
     fill(0);
   }
   text("s", 50, 75);
-    if (keyRightPressed) {
+  if (keyRightPressed) {
     fill(#08FF09);
   } else {
     fill(0);
@@ -140,13 +157,20 @@ void keyPressed() {
     keyRightPressed = true;
     keyLeftPressed = false;
   }
+
+  
+  //Adding Edges testing
+  if (keyCode >= 48 && keyCode < 57) {
+    nodeGraph.newEdge(nodeGraph.nodes.get(nodeGraph.nodes.size()-1), nodeGraph.nodes.get(keyCode - 48));
+
   if (key == ' ' && santa.cooldown1 < 1) {
     keyDashPressed = true;
+
   }
 }
 
 void keyReleased() {
-    if (key == 'w' || keyCode == UP) {
+  if (key == 'w' || keyCode == UP) {
     keyUpPressed = false;
   }
   if (key == 'a' || keyCode == LEFT) {
@@ -160,7 +184,17 @@ void keyReleased() {
   if (key == 'd' || keyCode == RIGHT) {
     keyRightPressed = false;
   }
+}
+
+
+void mousePressed() {
+  nodeGraph.newNode(mouseX, mouseY);
+  if (nodeGraph.nodes.size() == 1) {
+    child = new Child(mouseX, mouseY, 25, 25, 100, 300, nodeGraph.nodes.get(0));
+    Childs.add(child);
+
   if (key == ' ') {
     keyDashPressed = false;
+
   }
 }

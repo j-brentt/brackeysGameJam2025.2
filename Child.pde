@@ -5,11 +5,17 @@ class Child{
   boolean blind;
   PVector position; // this is center of child
   PVector velocity = new PVector(0,0);
+  float moveSpeed = 10;
   int sprite_type;
   float vision_angle; 
   float vision_radius;
   int facing_direction; //0 for right, 1 for down, 2 for left, 3 for up
   int blindTime;
+  
+  Node currentNode = null;
+  Node goalNode = null;
+  boolean isTraversing = false;
+  ArrayList<Node> traversalPath = new ArrayList<Node>();
   
   
   Child(float x, float y, float sizeX, float sizeY, float vision_angle, float vision_radius) {
@@ -21,17 +27,59 @@ class Child{
     this.blind = false;
     this.blindTime = 0;
   }
+  
+    Child(float x, float y, float sizeX, float sizeY, float vision_angle, float vision_radius, Node spawnNode) {
+    this.position = new PVector(x, y);
+    this.size = new PVector(sizeX, sizeY);
+    this.facing_direction = 2;
+    this.vision_angle = vision_angle;
+    this.vision_radius = vision_radius;
+    
+    this.currentNode = spawnNode;
+    isTraversing = false;
+  }
   void display() {
     PVector corner_position = new PVector(position.x-size.x/2, position.y-size.y/2);
+    graphTraversal();
     fill(100);
     rect(corner_position.x, corner_position.y, size.x, size.y);
     //draw child of correct sprite type (if we want children from different countries to look different, idk if we r gonna have moving/running animation. If we do, then add another int to the arguments and increment every number of frames)
     //then check frame number modulo no. of animation frames then display accordingly. I guess the same goes for santa.
   }
   void pathfinding(){
-    //yeah... i have no clue how we're gonna pathfind these kids towards santa in a maze. Is it okay if they're semi-random? It doesn't seem hard to stop them from running into walls at least, since u can just do a check by looping through the walls.
-    //but actual pathfinding seems hard... Ofc if they can see santa they should beeline to him, maybe thats more realistic anyways?
-    //hard code in the pathfinding by letting the children go in loops (maybe more than 1 loop for randomness). Or make grid manually for each stage and use A* algorithm
+    //change to traversalPath[1] or [2] maybe?
+    if (currentNode.position.dist(position) < 20) {
+      for (Node n : nodeGraph.nodes) {
+        n.reset();
+      }
+      traversalPath = aStar(currentNode, nodeGraph.santaNode);
+      //if (traversalPath == null) print("hi");
+      if (traversalPath != null) {
+        goalNode = traversalPath.get(traversalPath.size() - 1);
+        print(traversalPath.size());
+        for (Node n : traversalPath) {
+          println(n.position);
+        }
+      }
+
+    }
+  }
+  
+  void graphTraversal() {
+    if (traversalPath != null && traversalPath.size() > 1) {
+      Node nextNode = traversalPath.get(1);
+      PVector direction = nextNode.position.copy().sub(position);
+      direction.normalize();
+      velocity = direction.mult(moveSpeed);
+      position.add(velocity);
+      
+      
+      if (nextNode.position.dist(position) < moveSpeed) {
+        currentNode = nextNode;
+        traversalPath.remove(0);
+      }
+      
+    }
   }
   
   void createSightBullets(){
@@ -41,7 +89,7 @@ class Child{
       angle+= 2*PI/180;
       SightBullet sb = new SightBullet(position.x, position.y, angle, vision_radius, this);
       SightBullets.add(sb);
-      print("created sb");
+      //print("created sb");
     }
   }
   
@@ -85,12 +133,12 @@ class SightBullet{
      if (detectNoCollision(position, santa.position, pointsize, santa.size) == 2){
        deleted = true;
        santa.alive = false;
-       print("SANTA IS DEAD!!");
+       //print("SANTA IS DEAD!!");
      }
      for (Wall w : Walls){
      if (detectNoCollision(position, w.position, pointsize, w.size) == 2){
        deleted = true;
-       print("DELETED");
+       //print("DELETED");
      }
      }
    }

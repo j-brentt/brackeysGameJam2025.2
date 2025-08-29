@@ -1,15 +1,9 @@
- //<>//
-
-
-
-
-
-
-class Santa { //<>// //<>// //<>//
+class Santa {
   PVector position;
   PVector size = new PVector(50, 50);
   float weight;
   float friction = 0.95;
+
   boolean alive = true;
   float EMP_radius;
   PVector velocity = new PVector(0, 0);
@@ -18,6 +12,11 @@ class Santa { //<>// //<>// //<>//
   float maxacceltime; //time it takes to achieve max acceleration
   int coalcount; //write some event that checks santa's position against position of stockings and decrease counter
   int cookiecount; //should affect weight and hence maybe some of the vel/accel caps.
+  
+  // Item Trackings
+  int cookieCount = 0;
+  int stockingsFilled = 0; 
+  
   float cooldown1;
   float cooldown2;
   float cooldown3; //if we have abilities w cooldowns, maybe set cooldowns to infinity at start and only display them when finite
@@ -36,10 +35,26 @@ class Santa { //<>// //<>// //<>//
 
   void display() {
     // draw santa centered at x,y with size size
+    fill(255, 0, 0);
     rect(position.x, position.y, size.x, size.y);
   }
+  
+  // Called when the player presses 'E' for either collecting a cookie or filling a stocking
+  void interact(ArrayList<Cookie> cookies, ArrayList<Stocking> stockings)
+  {
+    for (Cookie c : cookies) {
+      if (!c.collected && c.overlapsWithSanta(this)) {
+        c.onInteract(this);
+      }
+    }
+    for (Stocking s : stockings) {
+      if (!s.collected && s.overlapsWithSanta(this)) {
+        s.onInteract(this);
+      }
+    }
+  }
 
-  void movement() {
+  void movement() { //<>//
 
     acceleration.set(0,0);
     if (keyUpPressed) acceleration.y = -0.2;
@@ -52,7 +67,7 @@ class Santa { //<>// //<>// //<>//
     if (abs(velocity.y) < 0.01) velocity.y = 0;
 
     if (!keyLeftPressed && !keyRightPressed) velocity.x *= friction;
-    if (abs(velocity.x) < 0.01) velocity.x = 0;
+    if (abs(velocity.x) < 0.01) velocity.x = 0; //<>//
 
 
     velocity.add(acceleration);
@@ -76,6 +91,9 @@ class Santa { //<>// //<>// //<>//
       } 
     }
   }
+  
+    
+    
   void xMovement(int sign) {
     velocity.x = maxVelocity * sign;
   }

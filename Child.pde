@@ -2,7 +2,7 @@ class Child{
   int alertness = 0;
   boolean enraged; //not sure if we're doing both systems or just 1
   PVector size;
-  
+  boolean blind;
   PVector position; // this is center of child
   PVector velocity = new PVector(0,0);
   float moveSpeed = 10;
@@ -10,6 +10,8 @@ class Child{
   float vision_angle; 
   float vision_radius;
   int facing_direction; //0 for right, 1 for down, 2 for left, 3 for up
+  int blindTime;
+  int blindTimeMax;
   
   Node currentNode = null;
   Node goalNode = null;
@@ -23,6 +25,9 @@ class Child{
     this.facing_direction = 2;
     this.vision_angle = vision_angle;
     this.vision_radius = vision_radius;
+    this.blind = false;
+    this.blindTime = 0;
+    this.blindTimeMax = 90;
   }
   
     Child(float x, float y, float sizeX, float sizeY, float vision_angle, float vision_radius, Node spawnNode) {
@@ -83,10 +88,9 @@ class Child{
     float angle;
     angle = facing_direction*90*PI/180 - (vision_angle/2)*PI/180;
     while (angle < facing_direction*90*PI/180 + (vision_angle/2) * PI/180){
-      angle+= 0.5*PI/180;
+      angle+= 2*PI/180;
       SightBullet sb = new SightBullet(position.x, position.y, angle, vision_radius, this);
       SightBullets.add(sb);
-      //print("created sb");
     }
   }
   
@@ -118,8 +122,8 @@ class SightBullet{
     this.c = c;
   }
   void display(){
-    fill(0,0,255);
-    line(xInit, yInit, x, y);
+    //fill(0,0,255);
+    //line(xInit, yInit, x, y);
   }
   void hitscan(){
    while(position.copy().sub(positionInit.copy()).mag() < radius && deleted == false){
@@ -127,15 +131,18 @@ class SightBullet{
      step = new PVector(10*cos(angle), 10*sin(angle));
 
      position.add(step);
-     if (detectNoCollision(position, santa.position, pointsize, santa.size) == 2){
+     if (detectNoCollision(position, santa.position, pointsize, santa.size) == 2 && santa.invisible == false){
        deleted = true;
-       santa.alive = false;
-       //print("SANTA IS DEAD!!");
+       santa.notObserved = false;
+       santa.timeObserved += 1;
+       if (santa.timeObserved > 180){
+       print("SANTA IS CAUGHT!!");
+       santa.timeObserved = 0;
+       }
      }
      for (Wall w : Walls){
      if (detectNoCollision(position, w.position, pointsize, w.size) == 2){
        deleted = true;
-       //print("DELETED");
      }
      }
    }

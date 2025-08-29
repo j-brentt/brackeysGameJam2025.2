@@ -3,7 +3,8 @@ ArrayList<Wall> Walls = new ArrayList<Wall>();
 ArrayList<Child> Childs = new ArrayList<Child>();
 ArrayList<SightBullet> SightBullets = new ArrayList<SightBullet>();
 PVector pointsize = new PVector(0,0);
-boolean keyUpPressed, keyDownPressed, keyLeftPressed, keyRightPressed;
+boolean keyUpPressed, keyDownPressed, keyLeftPressed, keyRightPressed, keyDashPressed;
+int dashedFrames = 0, dashInactive = 0;
 Santa santa;
 Wall wall;
 Child child;
@@ -53,7 +54,39 @@ void draw(){
   santa.alive = true; // this is for testing
   santa.update();
   santa.display();
+  if (keyDashPressed == true){
+  dashedFrames+= 1;
+    if (dashedFrames == 15){
+      santa.cooldown1 = 60;
+      keyDashPressed = false;
+      dashedFrames = 0;
+    }
+  }
   
+  santa.cooldown1 -= 1;
+  if (santa.cooldown1 < 1){
+    fill(0,255,0);
+    text("Dash:", 700, 700);
+    fill(255);
+    rect(825,672, 200, 30);
+    fill(0,255,0);
+    rect(825,672, (15-dashedFrames)*200/15, 30);
+    if (dashedFrames != 0){
+    dashInactive += 1;
+    }
+  }
+  if (dashInactive > 60){
+    dashInactive = 0;
+    dashedFrames = 0;
+  }
+  if (santa.cooldown1 >= 1){
+    fill(255,0,0);
+    text("Dash:", 700, 700);
+    fill(255);
+    rect(825,672, 200, 30);
+    fill(255,0,0);
+    rect(825,672, (15-dashedFrames)*200/15, 30);
+  }
   
   fill(0);
   if (keyUpPressed) {
@@ -103,6 +136,9 @@ void keyPressed() {
     keyRightPressed = true;
     keyLeftPressed = false;
   }
+  if (key == ' ' && santa.cooldown1 < 1) {
+    keyDashPressed = true;
+  }
 
 }
 
@@ -120,5 +156,8 @@ void keyReleased() {
 
   if (key == 'd' || keyCode == RIGHT) {
     keyRightPressed = false;
+  }
+  if (key == ' ') {
+    keyDashPressed = false;
   }
 }

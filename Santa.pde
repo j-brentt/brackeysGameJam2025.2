@@ -18,6 +18,7 @@ class Santa { //<>// //<>// //<>// //<>//
   //I think it would be cool if Santa could crash through walls with enough momentum. It would give you more reason to get funky with the controls and let him speed out of control, and a way to avoid getting cornered and waiting to die.
   Santa(float x, float y) {
     this.position = new PVector(x, y);
+    this.cooldown1 = 0;
   }
 
   void update() {
@@ -37,6 +38,7 @@ class Santa { //<>// //<>// //<>// //<>//
     if (keyDownPressed) acceleration.y = 0.2;
     if (keyLeftPressed) acceleration.x = -0.2;
     if (keyRightPressed) acceleration.x = 0.2;
+    if (keyDashPressed) acceleration.mult(7);
     
     if (!keyUpPressed && !keyDownPressed) velocity.y *= friction;
     if (abs(velocity.y) < 0.01) velocity.y = 0;
@@ -46,7 +48,9 @@ class Santa { //<>// //<>// //<>// //<>//
 
 
     velocity.add(acceleration);
+    if (keyDashPressed == false){
     velocity.limit(maxVelocity);
+    }
     for (Wall w : Walls) {
       PVector velocityX = new PVector(velocity.x, 0);
       PVector velocityY = new PVector(0, velocity.y);

@@ -33,8 +33,6 @@ ArrayList<Node> aStar(Node start, Node goal) {
         if (!open.contains(neighbor)) {
           open.add(neighbor);
         } else {
-          // Java's PriorityQueue does not update order automatically
-          // so we must remove and re-add the node to update its position
           open.remove(neighbor);
           open.add(neighbor);
         }

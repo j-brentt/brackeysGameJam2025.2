@@ -1,5 +1,5 @@
 class Child{
-  int alertness = 0; //(maybe this should be an int)
+  int alertness = 0;
   boolean enraged; //not sure if we're doing both systems or just 1
   PVector size;
   

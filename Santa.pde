@@ -46,7 +46,9 @@ class Santa {
 
   void display() {
     // draw santa centered at x,y with size size
+    if (santa.invisible == false){
     rect(position.x, position.y, size.x, size.y);
+    }
   }
 
   void movement() {

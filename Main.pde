@@ -36,14 +36,14 @@ void setup() {
   background(255);
   santa = new Santa(50, 50);
   wall = new Wall(200, 200, 10, 100, 1);
-  child = new Child(300, 250, 25, 25, 100, 300);
+  child = new Child(300, 250, 25, 25, 100, 150);
   Childs.add(child);
   Walls.add(wall);
   textSize(48);
 }
 
 void draw() {
-
+  santa.weight += 0.01;
   background(255);
   for (Wall w : Walls) {
     w.display();
@@ -54,7 +54,7 @@ void draw() {
     }
     if (c.blind == true) {
       c.blindTime += 1;
-      if (c.blindTime > 150) {
+      if (c.blindTime > c.blindTimeMax) {
         c.blind = false;
         c.blindTime = 0;
       }
@@ -155,7 +155,7 @@ void draw() {
 }
 
 void mouseClicked() {
-  Childs.add(new Child(mouseX, mouseY, 25, 25, 100, 300));
+  Childs.add(new Child(mouseX, mouseY, 25, 25, 100, 150));
 }
 
 void keyPressed() {

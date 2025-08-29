@@ -6,7 +6,7 @@ class Santa {
   boolean notObserved = true;
   float EMP_radius;
   PVector velocity = new PVector(0, 0);
-  float maxVelocity = 5;
+  float maxVelocity = 4;
   PVector acceleration = new PVector(0, 0);
   float maxacceltime; //time it takes to achieve max acceleration
   int coalcount; //write some event that checks santa's position against position of stockings and decrease counter
@@ -37,6 +37,7 @@ class Santa {
     this.invisibleTime = 0;
     this.invisibleTimeMax = 60;
     this.timeObserved = 0;
+    this.weight = 1;
   }
 
   void update() {
@@ -54,10 +55,12 @@ class Santa {
   void movement() {
 
     acceleration.set(0,0);
-    if (keyUpPressed) acceleration.y = -0.2;
-    if (keyDownPressed) acceleration.y = 0.2;
-    if (keyLeftPressed) acceleration.x = -0.2;
-    if (keyRightPressed) acceleration.x = 0.2;
+    float effectiveWeight = 1.75-0.75/sqrt(weight);
+    float accelerationRate = 0.15;
+    if (keyUpPressed) acceleration.y = -accelerationRate/effectiveWeight;
+    if (keyDownPressed) acceleration.y = accelerationRate/effectiveWeight;
+    if (keyLeftPressed) acceleration.x = -accelerationRate/effectiveWeight;
+    if (keyRightPressed) acceleration.x = accelerationRate/effectiveWeight;
     if (keyDashPressed) acceleration.mult(7);
     
     if (!keyUpPressed && !keyDownPressed) velocity.y *= friction;
@@ -69,7 +72,10 @@ class Santa {
 
     velocity.add(acceleration);
     if (keyDashPressed == false){
-    velocity.limit(maxVelocity);
+    velocity.limit(maxVelocity/effectiveWeight);
+    }
+    if (keyDashPressed == true){
+      velocity.limit(3*maxVelocity/effectiveWeight);
     }
     for (Wall w : Walls) {
       PVector velocityX = new PVector(velocity.x, 0);

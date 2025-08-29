@@ -1,7 +1,11 @@
 //I'm thinking we add walls to the Walls arraylist and then display them in draw()
+import java.util.PriorityQueue;
+import java.util.HashSet;
+
+
 ArrayList<Wall> Walls = new ArrayList<Wall>();
 ArrayList<Child> Childs = new ArrayList<Child>();
-ArrayList<SightBullet> SightBullets = new ArrayList<SightBullet>();
+ArrayList<SightBullet> SightBullets = new ArrayList<SightBullet>(); //<>//
 PVector pointsize = new PVector(0,0);
 boolean keyUpPressed, keyDownPressed, keyLeftPressed, keyRightPressed;
 Santa santa;
@@ -9,12 +13,12 @@ Wall wall;
 NodeGraph nodeGraph;
 Child child;
 
-int detectNoCollision(PVector obj1, PVector obj2, PVector size1, PVector size2){
+int detectNoCollision(PVector obj1, PVector obj2, PVector size1, PVector size2){ //<>//
   if (obj1.x+size1.x < obj2.x || obj1.x > obj2.x+size2.x || obj1.y+size1.y < obj2.y || obj1.y > obj2.y+size2.y){
     return 1;
   } else {
     return 2;
-  }
+  } //<>//
 }
 
 void setup() {
@@ -23,8 +27,8 @@ void setup() {
   santa = new Santa(50, 50);
   nodeGraph = new NodeGraph(-1);
   wall = new Wall(200, 200, 10, 100, 1);
-  child = new Child(300, 250, 25, 25, 100, 300);
-  Childs.add(child);
+  //child = new Child(300, 250, 25, 25, 100, 300);
+  //Childs.add(child);
   Walls.add(wall);
   textSize(48);
 }
@@ -34,9 +38,18 @@ void draw() {
   for (Wall w : Walls) {
     w.display();
   }
+  
+  
   for (Child c : Childs){
     c.createSightBullets();
     c.display();
+    
+    if (nodeGraph.santaNode != c.goalNode) {
+      c.pathfinding();
+    }
+    
+    
+    
   }
   for (SightBullet sb : SightBullets){
     sb.hitscan();
@@ -126,9 +139,20 @@ void keyReleased() {
   if (key == 'd' || keyCode == RIGHT) {
     keyRightPressed = false;
   }
+  
+  if (key == 'b') {
+    println("currentNode: " + child.currentNode.position);
+    println("goalNode: " + child.goalNode.position);
+    println("santaNode: " + nodeGraph.santaNode.position);
+
+  }
 }
 
 
 void mousePressed() {
   nodeGraph.newNode(mouseX, mouseY);
+  if (nodeGraph.nodes.size() == 1) {
+    child = new Child(mouseX, mouseY, 25, 25, 100, 300, nodeGraph.nodes.get(0));
+    Childs.add(child);
+  }
 }

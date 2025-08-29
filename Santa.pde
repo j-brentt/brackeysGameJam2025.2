@@ -14,21 +14,27 @@ class Santa {
   float cooldown1;
   float cooldown2;
   float cooldown3;
-  float ability1Cooldown;
-  float ability2Cooldown;
-  float ability3Cooldown;
+  boolean invisible;
+  int invisibleTime;
+  int invisibleTimeMax;
+  float ability1Cooldown; //cooldown for dash
+  float ability2Cooldown; //cooldown for EMP
+  float ability3Cooldown; //cooldown for invisibility
   //if we have abilities w cooldowns, maybe set cooldowns to infinity at start and only display them when finite
   //some of these variables are determined/affected by others, we just write those relations in the draw step. This is just to make writing functions easier hopefully if we want to use momentum.
   //I think it would be cool if Santa could crash through walls with enough momentum. It would give you more reason to get funky with the controls and let him speed out of control, and a way to avoid getting cornered and waiting to die.
   Santa(float x, float y) {
     this.position = new PVector(x, y);
-    this.cooldown1 = Float.POSITIVE_INFINITY;
-    this.cooldown2 = Float.POSITIVE_INFINITY;
-    this.cooldown3 = Float.POSITIVE_INFINITY;
+    this.cooldown1 = 0;
+    this.cooldown2 = 0;
+    this.cooldown3 = 0;
     this.EMP_radius = 200;
-    this.ability1Cooldown = Float.POSITIVE_INFINITY;
-    this.ability2Cooldown = Float.POSITIVE_INFINITY;
-    this.ability3Cooldown = Float.POSITIVE_INFINITY;
+    this.ability1Cooldown = 60;
+    this.ability2Cooldown = 150;
+    this.ability3Cooldown = 60;
+    this.invisible = false;
+    this.invisibleTime = 0;
+    this.invisibleTimeMax = 60;
   }
 
   void update() {

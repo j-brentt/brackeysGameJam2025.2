@@ -70,7 +70,7 @@ void draw() {
   if (keyDashPressed == true) {
     dashedFrames+= 1;
     if (dashedFrames == 15) {
-      santa.cooldown1 = 60;
+      santa.cooldown1 = santa.ability1Cooldown;
       keyDashPressed = false;
       dashedFrames = 0;
     }
@@ -78,6 +78,7 @@ void draw() {
 
   santa.cooldown1 -= 1;
   santa.cooldown2 -= 1;
+  santa.cooldown3 -= 1;
 
   if (santa.cooldown1 < 1) {
     fill(0, 255, 0);
@@ -90,7 +91,7 @@ void draw() {
       dashInactive += 1;
     }
   }
-  if (dashInactive > 60) {
+  if (dashInactive > santa.ability1Cooldown) {
     dashInactive = 0;
     dashedFrames = 0;
   }
@@ -102,6 +103,17 @@ void draw() {
     fill(255, 0, 0);
     rect(825, 672, (15-dashedFrames)*200/15, 30);
   }
+  if (santa.invisible == true){
+    santa.invisibleTime += 1;
+    if (santa.invisibleTime > santa.invisibleTimeMax){
+      santa.invisible = false;
+      santa.invisibleTime = 0;
+      santa.cooldown3 = santa.ability3Cooldown;
+    }
+  }
+  
+
+
 
   fill(0);
   if (keyUpPressed) {
@@ -162,9 +174,12 @@ void keyPressed() {
     for (Child c : Childs) {
       if (((c.position.copy()).sub(santa.position.copy())).mag() < santa.EMP_radius) {
         c.blind = true;
-        santa.cooldown2 = 600;
+        santa.cooldown2 = santa.ability2Cooldown;
       }
     }
+  }
+  if (key =='2' && santa.cooldown3 < 1){
+    santa.invisible = true;
   }
 }
 

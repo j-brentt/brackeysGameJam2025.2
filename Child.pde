@@ -82,7 +82,7 @@ class SightBullet{
      step = new PVector(10*cos(angle), 10*sin(angle));
 
      position.add(step);
-     if (detectNoCollision(position, santa.position, pointsize, santa.size) == 2){
+     if (detectNoCollision(position, santa.position, pointsize, santa.size) == 2 && santa.invisible == false){
        deleted = true;
        santa.alive = false;
        print("SANTA IS DEAD!!");

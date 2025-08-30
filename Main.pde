@@ -16,11 +16,22 @@ Santa santa;
 Wall wall;
 NodeGraph nodeGraph;
 Child child;
-ArrayList<PVector> objectPosition = new ArrayList<PVector>();
-ArrayList<PVector> objectSize = new ArrayList<PVector>();
-ArrayList<String> objectName = new ArrayList<String>();
-ArrayList<String> objectPrinted = new ArrayList<String>();
-ArrayList<Integer> objectNumber = new ArrayList<Integer>();
+
+ArrayList<Cookie> cookies;
+ArrayList<Stocking> stockings;
+ArrayList<Chimney> chimneys;
+
+// ---- interaction hold variables ----
+boolean interacting = false;
+int interactStartTime = 0;
+int interactHoldRequired = 3000;   // milliseconds required to hold (3000 ms = 3 s)
+Items currentTarget = null;
+boolean eDown = false; // track 'E' key state seperately
+
+// simple level state
+boolean levelOver = false;
+String message = "";
+int messageUntil = 0; // millis until which to show the transient message
 
 PImage[] SantaWalkFront = new PImage[9];
 PImage[] SantaWalkSide = new PImage[10];
@@ -29,6 +40,13 @@ PImage[] mapAssets;
 String[] filenames;
 int currentAssetIndex = 0;
 float imageHeight, imageWidth;
+
+//testing
+ArrayList<PVector> objectPosition = new ArrayList<PVector>();
+ArrayList<PVector> objectSize = new ArrayList<PVector>();
+ArrayList<String> objectName = new ArrayList<String>();
+ArrayList<String> objectPrinted = new ArrayList<String>();
+ArrayList<Integer> objectNumber = new ArrayList<Integer>();
 
 boolean detectCollision(PVector obj1, PVector obj2, PVector size1, PVector size2) {
   if (obj1.x+size1.x < obj2.x || obj1.x > obj2.x+size2.x || obj1.y+size1.y < obj2.y || obj1.y > obj2.y+size2.y) {
@@ -40,7 +58,19 @@ boolean detectCollision(PVector obj1, PVector obj2, PVector size1, PVector size2
 void setup() {
   frameRate(60);
 
-  
+  cookies = new ArrayList<Cookie>();
+  stockings = new ArrayList<Stocking>();
+  chimneys = new ArrayList<Chimney>();
+
+  // TEST OBJECTS
+  cookies.add(new Cookie(400, 150));
+  cookies.add(new Cookie(600, 300));
+  cookies.add(new Cookie(750, 500));
+  stockings.add(new Stocking(550, 150));
+  stockings.add(new Stocking(800, 400));
+
+  chimneys.add(new Chimney(1000, 200, 2));
+
   loadImages();
   size(1280, 720);
   background(255);
@@ -59,7 +89,7 @@ void setup() {
 
 void draw() {
   background(255);
-  for (int i=0;i<objectName.size();i++){
+  for (int i=0; i<objectName.size(); i++) {
     image(mapAssets[objectNumber.get(i)], objectPosition.get(i).x, objectPosition.get(i).y, objectSize.get(i).x, objectSize.get(i).y);
   }
   for (Wall w : Walls) {
@@ -82,6 +112,97 @@ void draw() {
       c.pathfinding();
     }
   }
+
+  for (Cookie c : cookies) c.display();
+  for (Stocking s : stockings) s.display();
+  for (Chimney ch : chimneys) ch.display();
+  
+   fill(0);
+  textSize(16);
+  text("Cookies eaten: " + santa.cookieCount, 550, 20);        // Can be changed later, sample texts
+  text("Stockings filled: " + santa.stockingsFilled, 550, 40);
+  
+  Items nearby = getNearbyItem();
+  boolean nearItem = (nearby != null);
+   if (nearItem && !interacting) {
+    // If the nearby is a chimney and stockings are insufficient, show requirement message
+    if (nearby instanceof Chimney) {
+      Chimney ch = (Chimney)nearby;
+      if (santa.stockingsFilled < ch.stockingsRequired) {
+        text("Fill " + ch.stockingsRequired + " stockings to finish", 10, height - 20);
+      } else {
+        text("Hold E for " + (ch.holdRequiredMillis/1000) + "s to finish level", 10, height - 20);
+      }
+    } else {
+      text("Hold E for 3s to interact", 10, height - 20);
+    }
+  }
+
+  // transient message display
+  if (millis() < messageUntil) {
+    fill(0);
+    textSize(14);
+    text(message, 10, height - 45);
+  }
+
+  // Interaction hold handling
+  if (interacting) {
+    if (currentTarget == null || currentTarget.collected) {
+      interacting = false;
+      currentTarget = null;
+    } else {
+      if (!currentTarget.overlapsWithSanta(santa)) {
+        interacting = false;
+        currentTarget = null;
+        message = "Moved away — interaction cancelled";
+        messageUntil = millis() + 1200;
+      } else {
+        int elapsed = millis() - interactStartTime;
+        float pct = constrain((float)elapsed / (float)interactHoldRequired, 0, 1);
+
+        float barW = 200;
+        float barH = 16;
+        float bx = 10;
+        float by = height - 60;
+        noFill();
+        stroke(0);
+        rect(bx, by, barW, barH);
+        noStroke();
+        fill(0, 200);
+        rect(bx, by, barW * pct, barH);
+
+        fill(0);
+        textSize(12);
+        text(int(pct * 100) + "%", bx + barW + 8, by + barH - 2);
+
+        // complete?
+        if (elapsed >= interactHoldRequired) {
+          // final safety checks
+          if (!currentTarget.collected && currentTarget.overlapsWithSanta(santa)) {
+            // special-case chimney: ensure stockings requirement is met
+            if (currentTarget instanceof Chimney) {
+              Chimney ch = (Chimney) currentTarget;
+              if (santa.stockingsFilled >= ch.stockingsRequired) {
+                // mark collected
+                ch.onInteract(santa);
+                // run level complete routine
+                levelComplete();
+              } else {
+                // shouldn't happen because we prevented start, but handle gracefully
+                message = "Not enough stockings filled!";
+                messageUntil = millis() + 1500;
+              }
+            } else {
+              currentTarget.onInteract(santa); // cookie or stocking
+            }
+          }
+          interacting = false;
+          currentTarget = null;
+        }
+      }
+    }
+  }
+  
   for (SightBullet sb : SightBullets) {
     sb.hitscan();
     sb.display();
@@ -173,16 +294,28 @@ void draw() {
   //  fill(0);
   //}
   //text("d", 75, 75);
-  
+
   //IJKL to scale, OP to cycle
   image(mapAssets[currentAssetIndex], mouseX, mouseY, imageWidth, imageHeight);
   fill(0);
   text(currentAssetIndex, 25, 25);
   text(filenames[currentAssetIndex], 50, 50);
-  
+
   fill(0);
   circle(storeX1, storeY1, 4);
   circle(storeX2, storeY2, 4);
+  
+  
+  
+  if (levelOver) {
+    fill(0);
+    textSize(36);
+    textAlign(CENTER, CENTER);
+    text("Level Complete!", width/2, height/2 - 20);
+    textSize(18);
+    text("Press R to restart (or implement next level transition)", width/2, height/2 + 20);
+    return;
+  }
 }
 
 
@@ -205,11 +338,47 @@ void keyPressed() {
     keyRightPressed = true;
     keyLeftPressed = false;
   }
-
-  //Adding Edges testing
-  if (keyCode >= 48 && keyCode < 57) {
-    nodeGraph.newEdge(nodeGraph.nodes.get(nodeGraph.nodes.size()-1), nodeGraph.nodes.get(keyCode - 48));
+  
+  
+   // Interaction key: START HOLD but only when not already interacting
+  if ((key == 'e' || key == 'E') && !interacting) {
+    Items target = getNearbyItem();
+    if (target != null && !target.collected) {
+      if (target instanceof Chimney) {
+        Chimney ch = (Chimney) target;
+        if (santa.stockingsFilled < ch.stockingsRequired) {
+          // show a short message instead of starting the hold
+          message = "You need " + ch.stockingsRequired + " stockings filled to finish!";
+          messageUntil = millis() + 1500;
+        } else {
+          // start chimney hold
+          interacting = true;
+          currentTarget = target;
+          interactStartTime = millis();
+          interactHoldRequired = target.holdRequiredMillis;
+          eDown = true;
+        }
+      } else {
+        // cookie/stocking normal start
+        interacting = true;
+        currentTarget = target;
+        interactStartTime = millis();
+        interactHoldRequired = target.holdRequiredMillis;
+        eDown = true;
+      }
+    } else {
+      // no nearby item; optional: message
+      message = "No item nearby to interact with";
+      messageUntil = millis() + 900;
+    }
   }
+
+  // restart key example
+  if ((key == 'r' || key == 'R') && levelOver) {
+    restartLevel();
+  }
+
+
   if (key == ' ' && santa.cooldown1 < 1) {
     keyDashPressed = true;
   }
@@ -225,18 +394,22 @@ void keyPressed() {
     santa.invisible = true;
   }
   
-  
+  //Adding Edges testing
+  if (keyCode >= 48 && keyCode < 57) {
+    nodeGraph.newEdge(nodeGraph.nodes.get(nodeGraph.nodes.size()-1), nodeGraph.nodes.get(keyCode - 48));
+  }
+
   if (key == 'i') {
     imageHeight -= 10;
   }
   if (key == 'j') {
     imageWidth -= 10;
   }
-  
+
   if (key == 'k') {
     imageHeight += 10;
   }
-  
+
   if (key == 'l') {
     imageWidth += 10;
   }
@@ -258,8 +431,8 @@ void keyReleased() {
     keyRightPressed = false;
   }
 
-  
-  //testing 
+
+  //testing
   if (key == 'b') {
     //println("currentNode: " + child.currentNode.position);
     //println("goalNode: " + child.goalNode.position);
@@ -276,26 +449,35 @@ void keyReleased() {
   if (key == ' ') {
     keyDashPressed = false;
   }
+  
+  // Interaction key: CANCEL HOLD
+  if (key == 'e' || key == 'E') {
+    interacting = false;
+    currentTarget = null;
+    eDown = false;
+  }
+  
+  
   if (key == 'i') {
     imageHeight += 5;
   }
   if (key == 'j') {
     imageWidth += 5;
   }
-  
+
   if (key == 'k') {
     imageHeight -= 5;
   }
-  
+
   if (key == 'l') {
     imageWidth -= 5;
   }
-  
-  
+
+
   if (key == 'o') {
     if (currentAssetIndex == 0) currentAssetIndex = mapAssets.length - 1;
     else currentAssetIndex -= 1;
-    
+
     imageHeight = mapAssets[currentAssetIndex].height;
     imageWidth = mapAssets[currentAssetIndex].width;
   }
@@ -305,15 +487,15 @@ void keyReleased() {
     imageHeight = mapAssets[currentAssetIndex].height;
     imageWidth = mapAssets[currentAssetIndex].width;
   }
-  if (key == 'u'){
-    objectName.add(filenames[currentAssetIndex].substring(0,filenames[currentAssetIndex].length()-4));
+  if (key == 'u') {
+    objectName.add(filenames[currentAssetIndex].substring(0, filenames[currentAssetIndex].length()-4));
     objectNumber.add(currentAssetIndex);
     objectPosition.add(new PVector(mouseX, mouseY));
     objectSize.add(new PVector(imageWidth, imageHeight));
     objectPrinted.add("image("+objectName.get(objectName.size()-1)+","+mouseX+","+mouseY+","+imageWidth+","+imageHeight+");");
   }
-  if (key == 'y'){
-    for (int i = 0; i< objectPrinted.size(); i++){
+  if (key == 'y') {
+    for (int i = 0; i< objectPrinted.size(); i++) {
       println(objectPrinted.get(i));
     }
   }

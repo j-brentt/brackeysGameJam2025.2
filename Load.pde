@@ -4,6 +4,28 @@ void resetState() {
   nodeGraph.nodes.clear();
 }
 
+void levelComplete() {
+  levelOver = true;
+  message = "Level Complete!";
+  messageUntil = millis() + 3000;
+  // You can add more: play a sound, start next level, show score screen, etc.
+}
+
+void restartLevel() {
+  levelOver = false;
+  // un-collect items
+  for (Cookie c : cookies) c.collected = false;
+  for (Stocking s : stockings) s.collected = false;
+  for (Chimney ch : chimneys) ch.collected = false;
+  // reset santa stats
+  santa.cookieCount = 0;
+  santa.stockingsFilled = 0;
+  // reset other states
+  interacting = false;
+  currentTarget = null;
+  message = "";
+}
+
 void loadImages() {
   String imageName;
   String dataPath = sketchPath("data");

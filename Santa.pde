@@ -9,8 +9,6 @@ class Santa {
   float maxVelocity = 4;
   PVector acceleration = new PVector(0, 0);
   float maxacceltime; //time it takes to achieve max acceleration
-  int coalcount; //write some event that checks santa's position against position of stockings and decrease counter
-  int cookiecount; //should affect weight and hence maybe some of the vel/accel caps.
   float cooldown1;
   float cooldown2;
   float cooldown3;
@@ -23,9 +21,13 @@ class Santa {
   float ability3Cooldown; //cooldown for invisibility
   float accelerationRate;
   float effectiveWeight;
-  //if we have abilities w cooldowns, maybe set cooldowns to infinity at start and only display them when finite
-  //some of these variables are determined/affected by others, we just write those relations in the draw step. This is just to make writing functions easier hopefully if we want to use momentum.
-  //I think it would be cool if Santa could crash through walls with enough momentum. It would give you more reason to get funky with the controls and let him speed out of control, and a way to avoid getting cornered and waiting to die.
+
+  int coalcount; //write some event that checks santa's position against position of stockings and decrease counter
+  int cookiecount; //should affect weight and hence maybe some of the vel/accel caps.
+  // Item Trackings
+  int cookieCount = 0;
+  int stockingsFilled = 0;
+
   Santa(float x, float y) {
     this.position = new PVector(x, y);
     this.cooldown1 = 0;
@@ -50,14 +52,29 @@ class Santa {
   void display() {
     // draw santa centered at x,y with size size
     fill(255, 0, 0);
-    if (santa.invisible == false){
-    rect(position.x, position.y, size.x, size.y);
+    if (santa.invisible == false) {
+      rect(position.x, position.y, size.x, size.y);
     }
-  }
+  } //<>// //<>//
 
-  void movement() { //<>//
+  // Called when the player presses 'E' for either collecting a cookie or filling a stocking
+  void interact(ArrayList<Cookie> cookies, ArrayList<Stocking> stockings)
+  {
+    for (Cookie c : cookies) {
+      if (!c.collected && c.overlapsWithSanta(this)) {
+        c.onInteract(this);
+      }
+    }
+    for (Stocking s : stockings) {
+      if (!s.collected && s.overlapsWithSanta(this)) {
+        s.onInteract(this);
+      }
+    }
+  } //<>// //<>//
 
-    acceleration.set(0,0);
+  void movement() {
+
+    acceleration.set(0, 0);
     effectiveWeight = 1.75-0.75/sqrt(weight);
     accelerationRate = 0.15;
     if (keyUpPressed) acceleration.y = -accelerationRate/effectiveWeight;
@@ -65,7 +82,7 @@ class Santa {
     if (keyLeftPressed) acceleration.x = -accelerationRate/effectiveWeight;
     if (keyRightPressed) acceleration.x = accelerationRate/effectiveWeight;
     if (keyDashPressed) acceleration.mult(7);
-    
+
     if (!keyUpPressed && !keyDownPressed) velocity.y *= friction;
     if (abs(velocity.y) < 0.01) velocity.y = 0;
 
@@ -74,17 +91,17 @@ class Santa {
 
 
     velocity.add(acceleration);
-    if (keyDashPressed == false){
-    velocity.limit(maxVelocity/effectiveWeight);
+    if (keyDashPressed == false) {
+      velocity.limit(maxVelocity/effectiveWeight);
     }
-    if (keyDashPressed == true){
+    if (keyDashPressed == true) {
       velocity.limit(3*maxVelocity/effectiveWeight);
     }
     for (Wall w : Walls) {
-      
+
       if (detectCollision(position.copy().add(velocity.x, 0), w.position, size, w.size)) {
         velocity.x = 0;
-      } 
+      }
 
       if (detectCollision(position.copy().add(0, velocity.y), w.position, size, w.size)) {
         velocity.y = 0;

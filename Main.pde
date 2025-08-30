@@ -5,7 +5,7 @@ import java.io.File;
 
 float storeX1, storeY1, storeX2, storeY2 = 0;
 
-
+PImage Bed1, Bed2, Counter_Corner, Counter_F, Counter_S, Deco_Painting, Deco_Plant, Door, Fireplace_F, Fireplace_S, Floorboard, Stocking_Unfilled, Stocking_Filled, Wall;
 ArrayList<Wall> Walls = new ArrayList<Wall>();
 ArrayList<Child> Childs = new ArrayList<Child>();
 ArrayList<SightBullet> SightBullets = new ArrayList<SightBullet>();
@@ -16,13 +16,17 @@ Santa santa;
 Wall wall;
 NodeGraph nodeGraph;
 Child child;
+ArrayList<PVector> objectPosition = new ArrayList<PVector>();
+ArrayList<PVector> objectSize = new ArrayList<PVector>();
+ArrayList<String> objectName = new ArrayList<String>();
+ArrayList<String> objectPrinted = new ArrayList<String>();
+ArrayList<Integer> objectNumber = new ArrayList<Integer>();
 
 PImage[] SantaWalkFront = new PImage[9];
 PImage[] SantaWalkSide = new PImage[10];
 PImage[] SantaWalkBackside = new PImage[9];
 PImage[] mapAssets;
 String[] filenames;
-
 int currentAssetIndex = 0;
 float imageHeight, imageWidth;
 
@@ -35,6 +39,7 @@ boolean detectCollision(PVector obj1, PVector obj2, PVector size1, PVector size2
 
 void setup() {
   frameRate(60);
+
   
   loadImages();
   size(1280, 720);
@@ -45,10 +50,18 @@ void setup() {
   wall = new Wall(200, 200, 10, 100, 1);
   Walls.add(wall);
   textSize(48);
+  objectName.clear();
+  objectNumber.clear();
+  objectPosition.clear();
+  objectPrinted.clear();
+  objectSize.clear();
 }
 
 void draw() {
   background(255);
+  for (int i=0;i<objectName.size();i++){
+    image(mapAssets[objectNumber.get(i)], objectPosition.get(i).x, objectPosition.get(i).y, objectSize.get(i).x, objectSize.get(i).y);
+  }
   for (Wall w : Walls) {
     w.display();
   }
@@ -291,6 +304,18 @@ void keyReleased() {
     else currentAssetIndex += 1;
     imageHeight = mapAssets[currentAssetIndex].height;
     imageWidth = mapAssets[currentAssetIndex].width;
+  }
+  if (key == 'u'){
+    objectName.add(filenames[currentAssetIndex].substring(0,filenames[currentAssetIndex].length()-4));
+    objectNumber.add(currentAssetIndex);
+    objectPosition.add(new PVector(mouseX, mouseY));
+    objectSize.add(new PVector(imageWidth, imageHeight));
+    objectPrinted.add("image("+objectName.get(objectName.size()-1)+","+mouseX+","+mouseY+","+imageWidth+","+imageHeight+");");
+  }
+  if (key == 'y'){
+    for (int i = 0; i< objectPrinted.size(); i++){
+      println(objectPrinted.get(i));
+    }
   }
 }
 

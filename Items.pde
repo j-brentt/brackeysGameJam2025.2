@@ -37,6 +37,7 @@ class Cookie extends Items {
       pushMatrix();
       ellipseMode(CORNER);
       ellipse(position.x, position.y, size.x, size.y);
+      ellipseMode(CENTER);
       popMatrix();
     }
   }

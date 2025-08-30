@@ -69,6 +69,7 @@ class NodeGraph {
       float tempDist;
       for (int i = 0; i < nodes.size(); i++) {
         nodes.get(i).display();
+        text(i, nodes.get(i).position.x, nodes.get(i).position.y);
 
         tempDist = nodes.get(i).position.dist(santa.position);
         if (tempDist < minDist) {

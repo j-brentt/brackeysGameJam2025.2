@@ -170,6 +170,7 @@ void draw() {
         noStroke();
         fill(0, 200);
         rect(bx, by, barW * pct, barH);
+        stroke(0);
 
         fill(0);
         textSize(12);
@@ -503,11 +504,11 @@ void keyReleased() {
 
 
 void mousePressed() {
-  //nodeGraph.newNode(mouseX, mouseY);
-  //if (nodeGraph.nodes.size() == 1) {
-  //  child = new Child(mouseX, mouseY, 25, 25, 100, 300, nodeGraph.nodes.get(0), 1);
-  //  Childs.add(child);
-  //}
+  nodeGraph.newNode(mouseX, mouseY);
+  if (nodeGraph.nodes.size() == 1) {
+    child = new Child(mouseX, mouseY, 25, 25, 100, 300, nodeGraph.nodes.get(0), 1);
+    Childs.add(child);
+  }
 
   if (mouseButton == LEFT) {
     storeX1 = mouseX;

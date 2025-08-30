@@ -245,7 +245,8 @@ void keyReleased() {
     keyRightPressed = false;
   }
 
-  //testing
+  
+  //testing 
   if (key == 'b') {
     //println("currentNode: " + child.currentNode.position);
     //println("goalNode: " + child.goalNode.position);

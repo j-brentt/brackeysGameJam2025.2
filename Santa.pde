@@ -21,6 +21,8 @@ class Santa {
   float ability1Cooldown; //cooldown for dash
   float ability2Cooldown; //cooldown for EMP
   float ability3Cooldown; //cooldown for invisibility
+  float accelerationRate;
+  float effectiveWeight;
   //if we have abilities w cooldowns, maybe set cooldowns to infinity at start and only display them when finite
   //some of these variables are determined/affected by others, we just write those relations in the draw step. This is just to make writing functions easier hopefully if we want to use momentum.
   //I think it would be cool if Santa could crash through walls with enough momentum. It would give you more reason to get funky with the controls and let him speed out of control, and a way to avoid getting cornered and waiting to die.
@@ -56,8 +58,8 @@ class Santa {
   void movement() { //<>//
 
     acceleration.set(0,0);
-    float effectiveWeight = 1.75-0.75/sqrt(weight);
-    float accelerationRate = 0.15;
+    effectiveWeight = 1.75-0.75/sqrt(weight);
+    accelerationRate = 0.15;
     if (keyUpPressed) acceleration.y = -accelerationRate/effectiveWeight;
     if (keyDownPressed) acceleration.y = accelerationRate/effectiveWeight;
     if (keyLeftPressed) acceleration.x = -accelerationRate/effectiveWeight;
@@ -79,21 +81,16 @@ class Santa {
       velocity.limit(3*maxVelocity/effectiveWeight);
     }
     for (Wall w : Walls) {
-      PVector velocityX = new PVector(velocity.x, 0);
-      PVector velocityY = new PVector(0, velocity.y);
-      if (detectNoCollision(position.copy().add(velocityX), w.position, size, w.size) == 1) {
-        position.add(velocityX);
-      }
-      if (detectNoCollision(position.copy().add(velocityX), w.position, size, w.size) == 2) {
+      
+      if (detectCollision(position.copy().add(velocity.x, 0), w.position, size, w.size)) {
         velocity.x = 0;
-      }
-      if (detectNoCollision(position.copy().add(velocityY), w.position, size, w.size) == 1) {
-        position.add(velocityY);
-      }
-      if (detectNoCollision(position.copy().add(velocityY), w.position, size, w.size) == 2) {
-        velocity.y = 0;
       } 
+
+      if (detectCollision(position.copy().add(0, velocity.y), w.position, size, w.size)) {
+        velocity.y = 0;
+      }
     }
+    position.add(velocity);
   }
   void xMovement(int sign) {
     velocity.x = maxVelocity * sign;

@@ -17,8 +17,10 @@ class Child {
   Node goalNode = null;
   boolean isTraversing = false;
   ArrayList<Node> traversalPath = new ArrayList<Node>();
+  
+  int moveMode = 1;
 
-  Child(float x, float y, float sizeX, float sizeY, float vision_angle, float vision_radius, Node spawnNode) {
+  Child(float x, float y, float sizeX, float sizeY, float vision_angle, float vision_radius, Node spawnNode, int moveMode) {
     this.position = new PVector(x, y);
     this.size = new PVector(sizeX, sizeY);
     this.facing_direction = 2;
@@ -27,10 +29,12 @@ class Child {
 
     this.currentNode = spawnNode;
     isTraversing = false;
+    this.moveMode = moveMode;
 
     this.blind = false;
     this.blindTime = 0;
     this.blindTimeMax = 90;
+    
   }
   void display() {
     PVector corner_position = new PVector(position.x-size.x/2, position.y-size.y/2);
@@ -50,7 +54,6 @@ class Child {
       //if (traversalPath == null) print("hi");
       if (traversalPath != null) {
         goalNode = traversalPath.get(traversalPath.size() - 1);
-        print(traversalPath.size());
         for (Node n : traversalPath) {
           println(n.position);
         }
@@ -65,11 +68,19 @@ class Child {
       direction.normalize();
       velocity = direction.mult(moveSpeed);
       position.add(velocity);
-
-
+      
       if (nextNode.position.dist(position) < moveSpeed) {
-        currentNode = nextNode;
-        traversalPath.remove(0);
+        
+        if (moveMode == 1) {
+          traversalPath.add(traversalPath.get(0));
+          currentNode = nextNode;
+          traversalPath.remove(0);
+          print(traversalPath.get(0).position);
+          
+        } else if (moveMode == 2) {
+          currentNode = nextNode;
+          traversalPath.remove(0);
+        }
       }
     }
   }
@@ -83,6 +94,17 @@ class Child {
       SightBullets.add(sb);
     }
   }
+  
+  void setTraversalPath(int[] pathIndices) {
+    println(pathIndices.length);
+    for (int i = 0; i < pathIndices.length; i++) {
+      println(i);
+      if (nodeGraph.nodes.size() > pathIndices[i]) traversalPath.add(nodeGraph.nodes.get(pathIndices[i]));
+      print(i);
+    }
+  }
+  
+
 }
 
 
@@ -119,7 +141,7 @@ class SightBullet {
       step = new PVector(10*cos(angle), 10*sin(angle));
 
       position.add(step);
-      if (detectNoCollision(position, santa.position, pointsize, santa.size) == 2 && santa.invisible == false) {
+      if (detectCollision(position, santa.position, pointsize, santa.size) && santa.invisible == false) {
         deleted = true;
         santa.notObserved = false;
         santa.timeObserved += 1;
@@ -129,7 +151,7 @@ class SightBullet {
         }
       }
       for (Wall w : Walls) {
-        if (detectNoCollision(position, w.position, pointsize, w.size) == 2) {
+        if (detectCollision(position, w.position, pointsize, w.size)) {
           deleted = true;
         }
       }
